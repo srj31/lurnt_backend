@@ -1,5 +1,8 @@
 from flask import request, jsonify, Flask
 import requests
+import json
+
+from helper import get_page, store_info_in_csv
 
 app = Flask(__name__)
 
@@ -11,13 +14,26 @@ GOOGLE_API = ' https://www.googleapis.com/customsearch/v1?key=' + \
 # Members API Route
 
 
-@app.route("/choices")
-def choices():
-    return {"choices": ["choice1", "choice2", "choice3"]}
+@app.route("/all_pages")
+def all_pages():
+    if 'choice' in request.args:
+        choice = str(request.args['choice'])
+
+    if 'lvl' in request.args:
+        lvl = str(request.args['lvl'])
+
+    url = GOOGLE_API+'&q='+lvl+"%20"+choice
+    response = requests.get(url).json()
+    items = response['items']
+
+    store_info_in_csv(items)
+
+    result = {"result": items}
+    return jsonify(result)
 
 
-@app.route("/pages", methods=["GET"])
-def pages():
+@app.route("/lurn", methods=["GET"])
+def lurn():
 
     if 'choice' in request.args:
         choice = str(request.args['choice'])
@@ -25,11 +41,14 @@ def pages():
     if 'lvl' in request.args:
         lvl = str(request.args['lvl'])
 
-    results = []
-
     url = GOOGLE_API+'&q='+lvl+"%20"+choice
-    response = requests.get(url)
-    return response.json()
+    response = requests.get(url).json()
+    items = response['items']
+
+    random_page = get_page(items)
+
+    result = {"result": random_page}
+    return jsonify(result)
 
 
 if __name__ == "__main__":
