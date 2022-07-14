@@ -19,16 +19,16 @@ def store_info_in_csv(pages):
             required_data.append(
                 [page['title'],  page['snippet']])
 
-    file_exists = exists('data.csv')
+    file_exists = exists('search_results.csv')
 
     if file_exists:
-        with open('data.csv', 'a+') as f:
+        with open('search_results.csv', 'a+') as f:
             write = csv.writer(f)
 
             write.writerows(required_data)
         return
 
-    with open('data.csv', 'w') as f:
+    with open('search_results.csv', 'w') as f:
         write = csv.writer(f)
 
         write.writerow(column_names)
