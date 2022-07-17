@@ -5,10 +5,18 @@ import pandas as pd
 import csv
 from os.path import exists
 
+from tfidf_model import top10_similarity_score
+
 
 def get_page(pages):
-    random_index = random.randint(0, 10)
-    return pages[random_index]
+    idx = 0
+    curScore = 0
+    for i, page in enumerate(pages):
+        totalScore = sum(top10_similarity_score(page))
+        if totalScore > curScore:
+            idx = i
+            curScore = totalScore
+    return pages[idx]
 
 
 def store_info_in_csv(pages):

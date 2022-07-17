@@ -1,3 +1,4 @@
+from numpy import vectorize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -5,13 +6,13 @@ import pandas as pd
 import re
 import string
 from nltk.stem import PorterStemmer
+from heapq import heappush, heappushpop
 
 ps = PorterStemmer()
 
 
 def preprocess_documents(documents):
     preprocessed_documents = []
-    i = 1
     for document in documents:
         document = document.lower()
         document = document.strip()
@@ -21,29 +22,28 @@ def preprocess_documents(documents):
 
         document = re.sub('\s+', ' ', document)
         document = re.sub(r'[^\w\s]', '', str(document).lower().strip())
-        if i == 1:
-            print(document)
         words = list(document.split(" "))
         words = [ps.stem(word) for word in words]
 
         document = ' '.join(words)
-        if i == 1:
-            print(document)
 
         document = re.sub(r'\d', ' ', document)
         document = re.sub(r'\s+', ' ', document)
         preprocessed_documents.append(document)
-        i += 1
     return preprocessed_documents
 
 
-def similarity_score(vectorizer, base_document):
-
+def top10_similarity_score(page):
+    vectorizer = TfidfVectorizer()
+    base_document = page['title'] + ' ' + page['snippet']
     df = pd.read_csv('label_learning.csv')
 
-    df['title_snippet'] = df['title'] + " " + df['snippet']
+    df_learning_data = df.loc[(df['is_tutorial'] == 1)]
 
-    documents = df['title_snippet'].tolist()
+    df_learning_data['title_snippet'] = df_learning_data['title'] + \
+        " " + df_learning_data['snippet']
+
+    documents = df_learning_data['title_snippet'].tolist()
 
     documents.insert(0, base_document)
     documents = preprocess_documents(documents)
@@ -56,7 +56,13 @@ def similarity_score(vectorizer, base_document):
     highest_score_index = 0
 
     zero_score_documents = []
+    heap = []
     for i, score in enumerate(cosine_similarities):
+        if len(heap) < 10:
+            heappush(heap, score)
+        else:
+            heappushpop(heap, score)
+
         if highest_score < score:
             highest_score = score
             highest_score_index = i+1
@@ -67,13 +73,4 @@ def similarity_score(vectorizer, base_document):
 
     print("Most similar document by TF-IDF with the score:",
           most_similar_document, highest_score)
-
-
-tf_idf_vectorizor = TfidfVectorizer()
-count_vectorizor = CountVectorizer()
-
-
-print("\033[1;32;40m --------------------------- this is Count-Vectorizer ----------------------------------------------------- \033[0;37;40m ")
-
-
-similarity_score(tf_idf_vectorizor, "intermediate drum lessons")
+    return heap

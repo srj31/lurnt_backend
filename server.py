@@ -1,6 +1,7 @@
 from flask import request, jsonify, Flask
 import requests
 import json
+import random
 
 from helper import get_page, store_info_in_csv
 
@@ -26,7 +27,7 @@ def all_pages():
     response = requests.get(url).json()
     items = response['items']
 
-    store_info_in_csv(items)
+    # store_info_in_csv(items)
 
     result = {"result": items}
     return jsonify(result)
@@ -41,7 +42,9 @@ def lurn():
     if 'lvl' in request.args:
         lvl = str(request.args['lvl'])
 
-    url = GOOGLE_API+'&q='+lvl+"%20"+choice
+    start_idx = str(random.randint(1, 90))
+
+    url = GOOGLE_API+'&q='+lvl+"%20"+choice+"&start="+start_idx
     response = requests.get(url).json()
     items = response['items']
 
