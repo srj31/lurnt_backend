@@ -42,10 +42,11 @@ def lurn():
     if 'lvl' in request.args:
         lvl = str(request.args['lvl'])
 
-    start_idx = str(random.randint(1, 90))
+    start_idx = str(random.randint(1, 50))
 
     url = GOOGLE_API+'&q='+lvl+"%20"+choice+"&start="+start_idx
     response = requests.get(url).json()
+    print(response)
     items = response['items']
 
     random_page = get_page(items)

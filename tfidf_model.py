@@ -71,6 +71,4 @@ def top10_similarity_score(page):
 
     most_similar_document = documents[highest_score_index]
 
-    print("Most similar document by TF-IDF with the score:",
-          most_similar_document, highest_score)
     return heap
