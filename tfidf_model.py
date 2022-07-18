@@ -52,23 +52,11 @@ def top10_similarity_score(page):
     cosine_similarities = cosine_similarity(
         embeddings[0:1], embeddings[1:]).flatten()
 
-    highest_score = 0
-    highest_score_index = 0
-
-    zero_score_documents = []
     heap = []
     for i, score in enumerate(cosine_similarities):
         if len(heap) < 10:
             heappush(heap, score)
         else:
             heappushpop(heap, score)
-
-        if highest_score < score:
-            highest_score = score
-            highest_score_index = i+1
-        if score == 0:
-            zero_score_documents.append(documents[i])
-
-    most_similar_document = documents[highest_score_index]
 
     return heap
