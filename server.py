@@ -46,7 +46,6 @@ def lurn():
 
     url = GOOGLE_API+'&q='+lvl+"%20"+choice+"&start="+start_idx
     response = requests.get(url).json()
-    print(response)
     items = response['items']
 
     random_page = get_page(items)
