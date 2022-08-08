@@ -1,5 +1,4 @@
 import random
-from tkinter import W
 from turtle import title
 import pandas as pd
 import csv
